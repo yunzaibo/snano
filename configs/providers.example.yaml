@@ -1,0 +1,45 @@
+vectorengine_native:
+  provider_group: vectorengine-group
+  adapter: gemini_generate_content
+  base_url: https://api.vectorengine.ai
+  api_key_env: MIR_VECTORENGINE_API_KEY
+  model: gemini-3-pro-image-preview
+  capability_bucket: IM
+  max_concurrency: 30
+  enabled: true
+vectorengine_compat:
+  provider_group: vectorengine-group
+  adapter: openai_images
+  base_url: https://api.vectorengine.ai
+  api_key_env: MIR_VECTORENGINE_API_KEY
+  model: gemini-3.1-flash-image-preview
+  capability_bucket: T
+  max_concurrency: 30
+  enabled: true
+gptge:
+  provider_group: gptge-group
+  adapter: openai_images
+  base_url: https://api.gpt.ge
+  api_key_env: MIR_GPTGE_API_KEY
+  model: gemini-3-pro-image-preview
+  capability_bucket: T
+  max_concurrency: 30
+  enabled: true
+aifast:
+  provider_group: aifast-group
+  adapter: gemini_generate_content
+  base_url: https://chat.aifast.site
+  api_key_env: MIR_AIFAST_API_KEY
+  model: gemini-3-pro-image-preview-vip
+  capability_bucket: I1
+  max_concurrency: 30
+  enabled: true
+aiwave:
+  provider_group: aiwave-group
+  adapter: gemini_generate_content
+  base_url: https://api2.ai-wave.org/gemini
+  api_key_env: MIR_AIWAVE_API_KEY
+  model: gemini-3-pro-image-preview
+  capability_bucket: T
+  max_concurrency: 30
+  enabled: true

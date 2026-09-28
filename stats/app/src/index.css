@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    @apply bg-ink-900 text-paper font-sans antialiased;
+    font-feature-settings: "ss01", "cv01";
+    /* 暖墨底, 非死黑: 顶部一抹暖光自然落到深墨 */
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, #17130d 0%, #100e0b 34%, #0b0a09 100%);
+    background-attachment: fixed;
+  }
+  ::selection { background: rgba(255, 154, 77, 0.28); color: #fff; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: rgba(236, 232, 225, 0.12); border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+}
+
+@layer components {
+  /* 暖色台面冷光 (极弱, 非渐变铺满) */
+  .lighttable-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    --glow-rgb: 255, 176, 112; /* 默认 snano 琥珀; App 按主导产线覆写为薄荷等 */
+    background:
+      radial-gradient(58% 42% at 50% -4%, rgba(var(--glow-rgb), 0.11), transparent 72%),
+      radial-gradient(46% 46% at 94% 6%, rgba(111, 224, 191, 0.05), transparent 70%),
+      radial-gradient(70% 50% at 50% 108%, rgba(255, 160, 96, 0.045), transparent 72%);
+    /* 极慢呼吸 —— 数据驱动的"常驻层"动感, 静止数据也微微有生命 */
+    animation: glowbreath 9s ease-in-out infinite;
+  }
+  /* 台面网格 (蓝图发丝格, 让底不再是死黑) */
+  .lighttable-grid {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.7;
+    background-image:
+      linear-gradient(rgba(236, 232, 225, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 232, 225, 0.03) 1px, transparent 1px);
+    background-size: 58px 58px;
+    -webkit-mask-image: radial-gradient(130% 100% at 50% 0%, #000 30%, transparent 92%);
+    mask-image: radial-gradient(130% 100% at 50% 0%, #000 30%, transparent 92%);
+  }
+  /* 胶片颗粒 (常驻层动感之一): 用 steps 抖动位移, 像真实胶片那样持续闪烁 —— 无数据变化也始终有微动。 */
+  .film-grain {
+    position: fixed; inset: -50%; width: 200%; height: 200%;
+    pointer-events: none; z-index: 40; opacity: 0.055; mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.8s steps(8) infinite;
+    will-change: transform;
+  }
+  /* 显影扫光 (常驻层动感之二): 一道暖光像放大机/扫描般掠过整页, 周而复始。
+     置于内容之上 + screen 混合, 所以"看得见"地拂过文字与图表, 而非藏在背后。 */
+  .lighttable-sweep {
+    position: fixed; inset: 0; pointer-events: none; z-index: 30; opacity: 1;
+    mix-blend-mode: screen;
+    background: linear-gradient(
+      to bottom,
+      transparent 42%,
+      rgba(255, 182, 120, 0.06) 47%,
+      rgba(255, 208, 152, 0.13) 50%,
+      rgba(255, 182, 120, 0.06) 53%,
+      transparent 58%
+    );
+    background-size: 100% 260%;
+    background-repeat: no-repeat;
+    animation: sweep 12s linear infinite;
+  }
+  /* 大数字扫光 (焦点动感): 一道暖色高光周期性掠过数字, 静止数据也有"被光照到"的生命。 */
+  .sheen-sweep {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .sheen-sweep::before {
+    content: ""; position: absolute; top: -30%; bottom: -30%; left: 0; width: 45%;
+    background: linear-gradient(105deg, transparent 0%, rgba(255, 214, 158, 0.55) 50%, transparent 100%);
+    filter: blur(3px); mix-blend-mode: screen;
+    transform: translateX(-220%);
+    animation: sheen 5.5s ease-in-out infinite;
+  }
+  /* 标尺式发丝线 (film/registration 刻度) */
+  .ruler-rule {
+    height: 9px; border-bottom: 1px solid rgba(236, 232, 225, 0.12);
+    background-image: repeating-linear-gradient(
+      to right, rgba(236, 232, 225, 0.16) 0 1px, transparent 1px 56px
+    );
+    background-position: bottom; background-repeat: repeat-x;
+  }
+  .kicker {
+    @apply font-mono text-[10px] uppercase text-paper-faint;
+    letter-spacing: 0.28em;
+  }
+  /* 入场: 只做位移、不碰透明度 —— 即便动画完全不推进, 内容始终可见, 绝不藏数据。 */
+  .reveal {
+    animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  /* 显影入场: 像相纸在显影液里由"颗粒+低反差"渐渐锐利成像 —— 切换范围时的"入场层"动感。
+     起点保留 0.3 不透明度 + 低反差而非全黑, 一帧也不真正藏掉数据轮廓; reduced-motion 直接关闭。 */
+  .develop {
+    animation: develop 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: filter, opacity, transform;
+  }
+  /* 柱状/分段入场: 同样只位移, 高度静态 */
+  .colrise {
+    animation: colrise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  /* 分段 LED 刻度 */
+  .seg {
+    height: 100%; border-radius: 1px;
+    transition: background-color 0.4s ease;
+  }
+}
+
+@keyframes reveal {
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
+}
+@keyframes develop {
+  0%   { opacity: 0.3; filter: blur(7px) contrast(0.55) brightness(1.45) saturate(0.6); transform: translateY(13px); }
+  55%  { opacity: 1;   filter: blur(2px) contrast(0.86) brightness(1.12) saturate(0.92); }
+  100% { opacity: 1;   filter: blur(0)   contrast(1)    brightness(1)    saturate(1);   transform: translateY(0); }
+}
+@keyframes glowbreath {
+  0%, 100% { opacity: 0.8;  transform: translate3d(-1.5%, 0, 0); }
+  50%      { opacity: 1;    transform: translate3d(1.5%, 0, 0); }
+}
+/* 胶片颗粒抖动: steps 离散位移 = 真实胶片闪烁感 */
+@keyframes grain {
+  0%   { transform: translate3d(0, 0, 0); }
+  12.5%{ transform: translate3d(-5%, -5%, 0); }
+  25%  { transform: translate3d(3%, -2%, 0); }
+  37.5%{ transform: translate3d(-3%, 4%, 0); }
+  50%  { transform: translate3d(4%, 2%, 0); }
+  62.5%{ transform: translate3d(-4%, -3%, 0); }
+  75%  { transform: translate3d(2%, 5%, 0); }
+  87.5%{ transform: translate3d(-2%, -4%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+/* 显影扫光: 暖光带自上而下缓缓掠过 */
+@keyframes sweep {
+  0%   { background-position: 0 -70%; }
+  100% { background-position: 0 170%; }
+}
+/* 大数字扫光: 高光从左掠到右, 后段停顿 */
+@keyframes sheen {
+  0%        { transform: translateX(-220%); }
+  55%, 100% { transform: translateX(460%); }
+}
+@keyframes colrise {
+  from { transform: translateY(7px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-grain { animation: none !important; transform: none !important; }
+  .lighttable-glow { animation: none !important; transform: none !important; }
+  .lighttable-sweep { animation: none !important; opacity: 0 !important; }
+  .sheen-sweep::before { animation: none !important; opacity: 0 !important; }
+  .reveal, .colrise {
+    animation: none !important; opacity: 1 !important; transform: none !important;
+  }
+  .develop {
+    animation: none !important; opacity: 1 !important; filter: none !important; transform: none !important;
+  }
+}

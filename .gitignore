@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv*/
+__pycache__/
+*.pyc
+configs/local/
+configs/sources.internal.yaml
+data/
+logs/
+*.log
+node_modules/
+dist/
+stats/app/public/stats-data.json
