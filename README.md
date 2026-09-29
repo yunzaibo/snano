@@ -3,7 +3,7 @@
 Snano 生图平台，包含两个 AI skill 和本地图片数量统计面板。
 
 - 安装后只提供两个 skill：`snano` 和 `simage`。
-- `snano`：只走 APIyi 聚合地址的 `nano-banana-pro`，支持文生图和参考图生成。
+- `snano`：只走中转站的 Gemini / Nano Banana 家族，支持按模型选择原生或兼容协议。
 - `simage`：只走 APIyi 聚合地址的 GPT Image 2.5，默认 `gpt-image-2.5-flare-vip`。
 - 用户明确指定数量时按要求执行，否则默认 1 张。只有数量矛盾或含义不清时才用中文询问。
 - 尺寸显示为 `1K`、`2K`、`4K` 或 `2048×2048`；比例显示为 `1:1`、`16:9` 等。
@@ -25,9 +25,11 @@ python3 -m venv .venv
 ```
 
 初始化脚本只在文件缺失时从模板创建 `.env.internal` 和
-`configs/sources.internal.yaml`。模板已经填好 APIyi 聚合地址、两个模型和请求路径，
+`configs/sources.internal.yaml`。模板已经填好 APIyi 聚合地址、模型和请求路径，
 本机只需要在 `.env.internal` 填入 `MIR_APIYI_API_KEY`；不要把真实 key 写回模板。
 提供模板不代表附赠 API 额度；真实生图使用你自己的账户。
+两个 runner 默认使用随仓库更新的 `configs/sources.apiyi.yaml`；Shell 中显式设置
+`MIR_SOURCES_CONFIG_FILE` 可使用自定义配置。初始化不会覆盖旧的本机配置。
 
 ## 模型和请求方式
 
@@ -35,6 +37,11 @@ python3 -m venv .venv
 
 - `snano` 使用 `nano-banana-pro`，文生图走 `POST /v1/images/generations`，参考图走
   `POST /v1/images/edits` 的 multipart 请求。
+- `snano --model` 还支持 `gemini-3-pro-image`、`gemini-3-pro-image-preview`、
+  `gemini-3-pro-image-preview-c`。三者使用中转站的 `/v1beta/models/{model}:generateContent`，
+  参考图为 Base64，尺寸为 `1K/2K/4K`。`-c` 仅显式选择，不作为画质升级。
+  规则与上游文档链接见 [Snano skill](skills/snano/SKILL.md#snano-模型与协议)。
+  这些新增映射按上游文档配置，本次未实测中转站出图。
 - `simage` 默认使用 `gpt-image-2.5-flare-vip`；同一个 key 还枚举到
   `gpt-image-2.5-sunburst-vip`，它适合精细编辑。两者同样使用 OpenAI Images 兼容请求，
   由路由统一归一化为图片产物。

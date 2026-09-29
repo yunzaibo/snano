@@ -31,6 +31,12 @@ routes:
     adapterFamily: openai_images
     path: /images/edits
     enabled: true
+  apiyi-gemini-native:
+    station: apiyi-main
+    adapterFamily: gemini_generate_content
+    baseUrl: https://api.morewater.vip
+    path: /v1beta/models/{model}:generateContent
+    enabled: true
 lanes:
   apiyi-snano:
     provider: apiyi
@@ -40,7 +46,7 @@ lanes:
     account: apiyi-primary
     credential: apiyi-primary-key
     route: apiyi-openai-edits
-    poolIdentity: apiyi-group/api.morewater.vip/snano-nano-banana-pro
+    poolIdentity: apiyi-group/api.morewater.vip/snano-gemini-image
     model: nano-banana-pro
     modelClass: Snano
     defaultSize: 2K
@@ -58,6 +64,57 @@ lanes:
       defaultSize: 2048x2048
       suppressFields:
       - aspect_ratio
+  apiyi-snano-gemini-3-pro-image:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-gemini-native
+    poolIdentity: apiyi-group/api.morewater.vip/snano-gemini-image
+    model: gemini-3-pro-image
+    modelClass: Snano
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 14
+    maxConcurrency: 30
+    priority: 11
+    enabled: true
+  apiyi-snano-gemini-3-pro-image-preview:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-gemini-native
+    poolIdentity: apiyi-group/api.morewater.vip/snano-gemini-image
+    model: gemini-3-pro-image-preview
+    modelClass: Snano
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 14
+    maxConcurrency: 30
+    priority: 12
+    enabled: true
+  apiyi-snano-gemini-3-pro-image-preview-c:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-gemini-native
+    poolIdentity: apiyi-group/api.morewater.vip/snano-gemini-image
+    model: gemini-3-pro-image-preview-c
+    modelClass: Snano
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 14
+    maxConcurrency: 30
+    priority: 13
+    enabled: true
   apiyi-simage-gpt-image-2-5-flare:
     provider: apiyi
     providerGroup: apiyi-group

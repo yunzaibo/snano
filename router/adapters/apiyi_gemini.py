@@ -7,6 +7,7 @@ from pathlib import Path
 
 from router.adapters.vectorengine_gemini import VectorEngineGeminiAdapter
 from router.core.models import GenerationRequest
+from router.core.snano_selection import validate_native_dimensions
 
 
 class ApiyiGeminiAdapter(VectorEngineGeminiAdapter):
@@ -33,14 +34,14 @@ class ApiyiGeminiAdapter(VectorEngineGeminiAdapter):
         )
 
     def build_request(self, request: GenerationRequest) -> dict:
+        validate_native_dimensions(request)
         parts: list[dict] = [{"text": request.prompt}]
         for ref in request.reference_images:
             parts.append(self._image_part(ref))
 
-        image_config = {
-            "aspectRatio": request.aspect_ratio or "1:1",
-            "imageSize": request.size or "4K",
-        }
+        image_config = {"imageSize": str(request.size or "2K").upper()}
+        if request.aspect_ratio and request.aspect_ratio.lower() != "auto":
+            image_config["aspectRatio"] = request.aspect_ratio
         return {
             "contents": [{"parts": parts}],
             "generationConfig": {
@@ -48,6 +49,11 @@ class ApiyiGeminiAdapter(VectorEngineGeminiAdapter):
                 "imageConfig": image_config,
             },
         }
+
+    def capability(self):
+        capability = super().capability()
+        capability.supported_sizes = ["1K", "2K", "4K"]
+        return capability
 
     def _add_auth_header(self, req: urllib.request.Request) -> None:
         req.add_header("Authorization", f"Bearer {self.api_key}")

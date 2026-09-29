@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "file_count": 109,
+  "file_count": 111,
   "checks": [
     "key_literal",
     "private_key",
@@ -15,11 +15,11 @@
   "files": {
     ".env.example": "4d691b0d127e8d69e7d7bf48dac9c5b9f1ed3b701cd3b177fd48ba31c215853d",
     ".gitignore": "1a38ef4ccbeb6d1cf439b07bf12e25ce13857d118c2ac4b256c4a3829b85e241",
-    "README.md": "fc071bf1f3d3b010ca5b59dd1f4812fc49cf97e288ca02df2abb7ed642296a88",
+    "README.md": "59d9b0e6b2ed922084bb473d4b1074bcb9496fc0a03809605faee0f5247f0e1f",
     "configs/providers.example.yaml": "952db2df10f07122990762f6bcb90bb33a5104e2193777b2d00538c64bafd0a8",
     "configs/providers.phase1-defaults.yaml": "94e6558153c1f240179ad933f135f53073d3340bff00e81823af6df175b0764d",
-    "configs/routing-presets.yaml": "3d86aec79626c086b8f974a435967057736ebf796ea44b1920ac8d4829c32ff1",
-    "configs/sources.apiyi.yaml": "0883f57fa032d59da113ffffc447c4383813e730bc518961cc079cc728440b82",
+    "configs/routing-presets.yaml": "bd5ed7dbb036002dd04d131a6ec79f7bb0f7f10842f18dd81a69e4fba678c566",
+    "configs/sources.apiyi.yaml": "0157f15e006adc5cd862e6257ca23e0baf4c804aa63262aa294c559821cd281a",
     "env.apiyi.example": "4d691b0d127e8d69e7d7bf48dac9c5b9f1ed3b701cd3b177fd48ba31c215853d",
     "requirements.txt": "b4603b9468ade4d639d2c6f73b89d50e1fa5d227c73ab15be0382cca478513e6",
     "router/__init__.py": "52ae14fba09de4e2a28d6e283f96cf14a150e1400893bcfbf1adf6685fa84467",
@@ -27,7 +27,7 @@
     "router/adapters/aifast_gemini.py": "3028214b1020b74fd0bf6b37b26b041b1294582aa457e003c56e17e8d8db1c33",
     "router/adapters/aifast_openai_compat.py": "ffbcdcdfc3213a9269724f10f3d9a7d33f1ccc4ebc33630742a6c4acee20a1d9",
     "router/adapters/aiwave_gemini.py": "387781312d26f16da8d798e583f00ed7a419d9887c8706e5afe52be0ec316fca",
-    "router/adapters/apiyi_gemini.py": "7fd08091cf5712cae40509854e27d47b0d85fe898b0b50c1d81a94429eca3683",
+    "router/adapters/apiyi_gemini.py": "d5ec9f76983f5875f58c6f60f6e8d36d9bad6f499fe587436d611e9b7a610330",
     "router/adapters/base.py": "afc9d107adf78ead2fecf06306c9040fcd23bee5bde938268435ebc3d5ec0f7c",
     "router/adapters/gptge_openai_images.py": "0c2ee093d3348f3fff8519c7610a8d0a1054e26a12122b98951a6cd412f232c8",
     "router/adapters/relay_openai_images.py": "957a54a28b31185b07f0214dc27c5f20aafe800b40f4a1b23e4387e447d47463",
@@ -37,7 +37,7 @@
     "router/core/artifact_metrics.py": "378112ba21aa7b6c6e90aece060dd2966063e70254ffd4083357bef402e6e333",
     "router/core/artifacts.py": "fe7638d54850fd384e66387a87ea3d1844f901f31b1b7bbf46b973f491946372",
     "router/core/batch_metrics.py": "54816dc84b7e2a626a0ee15b7a7c4195ae9a45701e16838cad39f281180e9a94",
-    "router/core/batch_runner.py": "a6002d03176c05dfff7b23f36b4b78b06894ac14035f7813f6e4cdf565c433e6",
+    "router/core/batch_runner.py": "4919061793e2eb6413baba987104fc9ce0b875871070effa34af7e4bf7dac185",
     "router/core/benchmark.py": "b28edbdc523b09371a67e2b0d368c666ba2ad8c788897119ee79399d6132fa74",
     "router/core/control_report.py": "592792d93a88abb4ba6f52066b4d2e903e07112a4c5631824bbb049e6c80e3ba",
     "router/core/dedupe.py": "dfd67c65a980b61512b66230f8a05e01a8235edb4ff7c599efb0f25ef7ad30e2",
@@ -68,6 +68,7 @@
     "router/core/runtime_config.py": "c522cb27930db363b5d5f350b0b24e84405923d3e54ff6413b9dc584dec0f335",
     "router/core/scheduler.py": "e53bdd841d00db0e9d80b4ac6229d27acfb882c20b5d2e0e2aca6a0f9db362a8",
     "router/core/simage_selection.py": "632c9dbacc906803b32ab579069c11865b5d201694b6bfc017c6d3d4a22705a4",
+    "router/core/snano_selection.py": "89d5009e2832346a802edc0171fa798f9fe11e593997539f1b3ad866cfd27845",
     "router/core/source_config.py": "40acb38b53b6600bb69840933734d889312f8d82c343eb14fe09dd1b1fa6ab9c",
     "router/main.py": "babed3a1d72611800f83d44ca5cf3117b50786de7ef7d39754eb31519cd1257e",
     "router/perf_report.py": "08c99828c66a4341be9dc8b1e6f36aab03da8b767465e9f9847c0f52640be546",
@@ -77,8 +78,8 @@
     "scripts/setup_local.py": "88901e3798b6a3efe44fb6268064850198c085f63c16047baa1baff3953d7a66",
     "skills/simage/SKILL.md": "90d864432cc630bd3f547608e00f53055aba50251fcd029f90680d96d2720adf",
     "skills/simage/scripts/simage-run.py": "d58d3743ff76a848c9b754123a9604145aa1e0de528086b68977d396df63fb21",
-    "skills/snano/SKILL.md": "f6458d90fe28a793cf5418cb4e1da115b6dc1dbc17a2f6b154d2cb9ff5421f29",
-    "skills/snano/scripts/snano-run.py": "40cbcc53070f84625578c8a343a77d02082526ce3d7f796d78ff80767499e101",
+    "skills/snano/SKILL.md": "3e61ba2e4276410cb43bd043bdf73eb3de4d7143d5842c3dcc2cd957aaf80b91",
+    "skills/snano/scripts/snano-run.py": "37900c7c57e2898bec78bd22e7ace70034de2392fbf25cebc8ad2783f37dbc88",
     "stats/aggregate.py": "33cf7e9c4a68eeed13ffced72b306e1cb6768a9a555d8e095e5f55d673409e4f",
     "stats/app/.oxlintrc.json": "b4d344818a1e1bf43997e4744a9153c8eef770c98b58229cd86363dabb85ded4",
     "stats/app/index.html": "21d89060c52a03c733534fb33ab8c08611c9227217bd442c9f6098d0102bdc2c",
@@ -87,7 +88,7 @@
     "stats/app/postcss.config.js": "e32657baf631d7c5f4dc67b4b2ee0ec8e7d5b3c41860e09cddce7c0377cd80bc",
     "stats/app/public/favicon.svg": "61bc9a161de58248288e6905425d7180f0624c2865007b97d763fdac12043a66",
     "stats/app/public/icons.svg": "b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a",
-    "stats/app/public/stats-data.json": "f71ba9e723d481e2646bc86b2a3999cd2f566ee74760c872c2f2e647dc419b29",
+    "stats/app/public/stats-data.json": "43ab924cba959bcd66341fc5b51c6517e0208577a594384ba8e30d860413ce85",
     "stats/app/src/App.tsx": "4921b90f20a99622872a04c782b743cfa9fb76e76d7f5800fbd123ba0e0c1a93",
     "stats/app/src/components/Hero.tsx": "007b351c547745be0ecc00928366ad3cfad67768a73a0f420705baa3a5451032",
     "stats/app/src/components/Lanes.tsx": "a2011df821e7addfc87f82b5bd1123a08270e9b66ef353f5b00529f49e0a6663",
@@ -121,6 +122,7 @@
     "stats/panel.sh": "a7c88a33940423d4402cdf5a3949a4b38d6ac03f332b25298ae205f8bdc2856c",
     "stats/serve.sh": "0fc3833291432b23bdd5d9ca0039f7b0f8de565e2f9486f480cd03adbf82d1b6",
     "stats/sync_run.py": "93704c2ddde0ed9ff280e9c734c936136574500bb618969d463f2ff493ffb594",
-    "tests/test_simage_selection.py": "bb3e57b77f2dce64c7e617c87d7f06946441263f76115e6b59b1516f83ab4aaf"
+    "tests/test_simage_selection.py": "bb3e57b77f2dce64c7e617c87d7f06946441263f76115e6b59b1516f83ab4aaf",
+    "tests/test_snano_selection.py": "d08fe167daebf64f845d0394869c7179233753d4991c61ae1759f90b888c5356"
   }
 }

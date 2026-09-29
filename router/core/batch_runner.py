@@ -46,6 +46,7 @@ from router.core.response_contract import response_contract_signal
 from router.core.routing_policy import RoutingPolicyPlan, resolve_routing_policy
 from router.core.routing_presets import RoutingPreset
 from router.core.scheduler import ProviderState
+from router.core.snano_selection import select_snano_model
 from router.core.simage_selection import select_simage_model
 
 
@@ -1825,14 +1826,22 @@ def run_job_file(
         default_routing_policy=routing_policy,
         default_provider_tier=provider_tier,
     )
-    if routing_preset and routing_preset.model_selection == "simage-v1":
+    if routing_preset and routing_preset.model_selection in {"simage-v1", "snano-v1"}:
         allowed = providers if providers is not None else routing_preset.providers
         selected_items = []
         for item_id, request, item_providers in items:
             candidates = item_providers if item_providers is not None else allowed
             if any(name not in allowed for name in candidates):
-                raise ValueError("Item provider exceeds the Simage preset/provider restriction")
-            selection = select_simage_model(request, candidates)
+                raise ValueError("Item provider exceeds the model-selection preset/provider restriction")
+            if routing_preset.model_selection == "simage-v1":
+                selection = select_simage_model(request, candidates)
+            else:
+                selection = select_snano_model(request, candidates)
+                size = str(request.size or routing_preset.default_size or "2K").upper()
+                edge = {"1K": 1024, "2K": 2048, "4K": 4096}.get(size)
+                if edge:
+                    request.metadata.setdefault("artifactMinWidth", edge)
+                    request.metadata.setdefault("artifactMinHeight", edge)
             request = _with_request_metadata(
                 request,
                 {
@@ -1936,7 +1945,10 @@ def run_job_file(
             if routing_preset and routing_preset.default_size:
                 effective_request = _with_request_defaults(effective_request, size=routing_preset.default_size)
             if preset_metadata:
-                effective_request = _with_request_metadata(effective_request, preset_metadata)
+                defaults = preset_metadata
+                if routing_preset and routing_preset.model_selection == "snano-v1":
+                    defaults = {key: effective_request.metadata.get(key, value) for key, value in defaults.items()}
+                effective_request = _with_request_metadata(effective_request, defaults)
             explained = _explain_single_request(
                     effective_request,
                     item_id=item_id,
@@ -1996,7 +2008,10 @@ def run_job_file(
             if routing_preset and routing_preset.default_size:
                 effective_request = _with_request_defaults(effective_request, size=routing_preset.default_size)
             if preset_metadata:
-                effective_request = _with_request_metadata(effective_request, preset_metadata)
+                defaults = preset_metadata
+                if routing_preset and routing_preset.model_selection == "snano-v1":
+                    defaults = {key: effective_request.metadata.get(key, value) for key, value in defaults.items()}
+                effective_request = _with_request_metadata(effective_request, defaults)
             if async_submit_only:
                 effective_request = _with_request_metadata(effective_request, {"async_submit_only": True})
             effective_retries = (

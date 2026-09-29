@@ -1,9 +1,14 @@
 schemaVersion: routing-presets/v1
 presets:
   snano:
-    description: APIyi-only Nano Banana Pro image line.
+    description: APIyi aggregate Gemini/Nano Banana variants.
+    modelSelection: snano-v1
     providers:
     - apiyi-snano
+    - apiyi-snano-gemini-3-pro-image
+    - apiyi-snano-gemini-3-pro-image-preview
+    - apiyi-snano-gemini-3-pro-image-preview-c
+    maxRetriesPerProvider: 0
     routingPolicy: fallback
     providerTier: professional
     defaultSize: 2K

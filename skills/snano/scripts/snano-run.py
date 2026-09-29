@@ -85,6 +85,8 @@ def ensure_supported_python() -> None:
 
 ensure_supported_python()
 
+from router.core.snano_selection import MODEL_CHOICES  # noqa: E402
+
 from router.snano_dispatch import (  # noqa: E402
     DEFAULT_SNANO_GROUP_SIZE,
     DEFAULT_SNANO_PROVIDERS,
@@ -391,6 +393,8 @@ def main() -> int:
     parser.add_argument("--group-size", type=int, default=DEFAULT_SNANO_GROUP_SIZE, help="Max items per provider group")
     parser.add_argument("--max-workers", type=int, default=None, help="Maximum parallel workers; default is total item count")
     parser.add_argument("--preset", default="snano", help="Routing preset used for the unified Snano batch")
+    parser.add_argument("--model", choices=MODEL_CHOICES, default="auto", help="Snano 内部模型名称")
+    parser.add_argument("--intent", choices=("auto", "speed", "professional"), default="auto", help="任务意图；professional 选择 Gemini 原生协议")
     parser.add_argument("--routing-policy", default=None, help="Override routing policy, e.g. fallback, load_balance, speed_first")
     parser.add_argument("--project-profile", default=None, help="Dimension defaults profile, e.g. amazoncar")
     parser.add_argument("--aspect-ratio", default=None, help="Optional target ratio, e.g. 16:9. Omit for auto.")
@@ -401,6 +405,8 @@ def main() -> int:
     parser.add_argument("--aspect-strict", action="store_true", help="Treat aspect-ratio mismatch as a hard artifact failure")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    if args.preset != "snano" and (args.model != "auto" or args.intent != "auto"):
+        parser.error("模型选择参数需要使用 --preset snano")
 
     if args.manifest:
         source_manifest, items = load_manifest_items(args.manifest)
@@ -444,6 +450,14 @@ def main() -> int:
     if args.group_size < 1:
         raise SystemExit("--group-size must be >= 1")
 
+    for item in items:
+        metadata = item.setdefault("metadata", {})
+        for key, value in (("snanoModel", args.model), ("snanoIntent", args.intent)):
+            if value != "auto":
+                metadata[key] = value
+            else:
+                metadata.setdefault(key, value)
+
     output_root = Path(args.output_root).expanduser().resolve()
     run_id = f"{time.strftime('snano_%Y%m%dT%H%M%SZ', time.gmtime())}_{uuid.uuid4().hex[:8]}"
     run_root = output_root / run_id
@@ -451,7 +465,7 @@ def main() -> int:
 
     env = load_env_file(PROJECT_ROOT / ".env.internal")
     env = bypass_proxy_for_apiyi(env)
-    env["MIR_SOURCES_CONFIG_FILE"] = str(PROJECT_ROOT / "configs" / "sources.internal.yaml")
+    env["MIR_SOURCES_CONFIG_FILE"] = os.environ.get("MIR_SOURCES_CONFIG_FILE") or str(PROJECT_ROOT / "configs" / "sources.apiyi.yaml")
     env["MIR_ROUTING_PRESETS_FILE"] = str(PROJECT_ROOT / "configs" / "routing-presets.yaml")
 
     root_manifest = run_root / "snano-input-manifest.json"
@@ -468,6 +482,11 @@ def main() -> int:
         routing_policy=args.routing_policy,
     )
     ok = bool(batch_summary.get("ok")) and int(batch_summary.get("returncode") or 0) == 0
+    selections = []
+    if batch_summary.get("summary_path"):
+        disk_summary = json.loads(Path(batch_summary["summary_path"]).read_text(encoding="utf-8"))
+        selections = [row["request_contract"]["model_selection"] for row in disk_summary.get("items", [])
+                      if row.get("request_contract", {}).get("model_selection")]
     success_count = int(batch_summary.get("success_count") or 0)
     failure_count = int(batch_summary.get("failure_count") or 0)
     final_summary = {
@@ -476,7 +495,8 @@ def main() -> int:
         "run_root": str(run_root),
         "source_manifest": source_manifest,
         "input_manifest": str(root_manifest),
-        "providers": DEFAULT_SNANO_PROVIDERS,
+        "providers": sorted({row["provider"] for row in selections}) if selections else DEFAULT_SNANO_PROVIDERS,
+        "model_selection": selections,
         "total_items": len(items),
         "request_type": items[0].get("requestType") if items else None,
         "size": args.size,

@@ -4,7 +4,10 @@
   "source": "empty",
   "lineLanes": {
     "snano": [
-      "apiyi-snano"
+      "apiyi-snano",
+      "apiyi-snano-gemini-3-pro-image",
+      "apiyi-snano-gemini-3-pro-image-preview",
+      "apiyi-snano-gemini-3-pro-image-preview-c"
     ],
     "simage": [
       "apiyi-simage-gpt-image-2-5-flare",

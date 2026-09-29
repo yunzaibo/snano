@@ -21,3 +21,41 @@ python3 scripts/snano-run.py --prompt "产品摄影" --count 1 --size 2K --outpu
 数量有歧义时由 agent 询问并显式传 `--count`，不要依赖正则猜测复杂提示词。
 复制安装时设置 `SNANO_PROJECT_ROOT` 为路由根目录。只查看统计时使用 `view` 子命令。
 不得展示或提交 API key、本机 .env、图片、ledger 和原始响应。
+
+## Snano 模型与协议
+
+本技能只调用 Gemini / Nano Banana 生图模型，不调用 GPT Image，也不转交 simage。
+模型名称保持上游原样，端点统一替换为本项目的 New API 中转站。
+
+| `--model` | 协议与用途 |
+| --- | --- |
+| `nano-banana-pro` | 保留既有中转兼容别名；文生图用 `/v1/images/generations` JSON，编辑用 `/v1/images/edits` multipart |
+| `gemini-3-pro-image` | APIyi 文档中的稳定名称；原生 Gemini 文生图、精细编辑、多图合成 |
+| `gemini-3-pro-image-preview` | APIyi 文档中的 preview 名称；同样使用原生 Gemini 协议 |
+| `gemini-3-pro-image-preview-c` | 上游文档中的按次计费别名，能力不是升级版；仅用户明确指定时使用 |
+
+Gemini 三个名称均调用 `https://api.morewater.vip/v1beta/models/{model}:generateContent`，
+使用 Bearer 认证。参考图放入 `contents[].parts[].inlineData`，按 Base64 传入；
+尺寸传 `generationConfig.imageConfig.imageSize`（`1K`、`2K`、`4K`），比例单独传
+`aspectRatio`。未指定比例时不发送 `auto` 字面值。不要把像素尺寸直接传给原生 imageSize；
+用户给出具体像素时，说明原生接口使用分辨率档位与比例，先确认可接受的档位，不承诺像素精确一致。
+
+判断规则：用户明确模型优先；否则精细编辑、专业排版或多图合成可传 `--intent professional`，
+路由选择 `gemini-3-pro-image`。普通任务默认保留 `nano-banana-pro`。
+`--intent speed` 也保留兼容别名，但没有实测速率保证。
+这些是本项目的选择规则，不代表稳定名比 preview 必然质量更好；同模型的不同别名也不意味着不同能力。
+不自动猜测或拼接 `-4k`、`-vip` 等后缀，不在失败后静默换型号。
+
+```bash
+python3 scripts/snano-run.py --prompt "产品海报" --intent professional --count 2 --size 4K --aspect-ratio 16:9 --output-root /absolute/output --dry-run
+python3 scripts/snano-run.py --prompt "保持主体，更换背景" --reference /absolute/reference.png --model gemini-3-pro-image-preview --count 1 --size 2K --output-root /absolute/output --dry-run
+```
+
+可在 manifest 的每项 metadata 设置 `snanoModel`、`snanoIntent`。dry-run 显示模型、路由和选择原因。
+配置按“中转站同名、同协议转发”接入，未经本次付费实测；不在每次使用前拉取模型列表。
+若中转站未映射对应名称，应报告错误，不自行更换模型。
+
+协议依据：[APIyi 文生图](https://docs.apiyi.com/api-capabilities/nano-banana-image/text-to-image)、
+[图片编辑](https://docs.apiyi.com/api-capabilities/nano-banana-image/image-edit)、
+[稳定模型原生示例](https://docs.apiyi.com/api-capabilities/nano-banana-image/skills)、
+[-c 后缀](https://docs.apiyi.com/faq/model-name-suffix-c)。
