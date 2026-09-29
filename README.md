@@ -37,9 +37,9 @@ python3 -m venv .venv
   `POST /v1/images/edits` 的 multipart 请求。
 - `simage` 默认使用 `gpt-image-2.5-flare-vip`；同一个 key 还枚举到
   `gpt-image-2.5-sunburst-vip`，它适合精细编辑。两者同样使用 OpenAI Images 兼容请求，
-  返回 `data[].b64_json`。
-- 已验证的模型发现方式是带 Bearer key 请求 `GET /v1/models`；模板不会自动把 key
-  写入日志、仓库或统计数据。
+  由路由统一归一化为图片产物。
+- 模型和后缀以 `configs/sources.apiyi.yaml` 中的明确 lane 为准；模板不会自动把 key
+  写入日志、仓库或统计数据，也不会根据未知别名猜测模型。
 
 ## 使用
 
@@ -94,3 +94,4 @@ bash stats/panel.sh real
 包含源码、测试、配置模板、空统计数据及 skill。
 排除真实 `.env`、本地 API 配置、图片、ledger、日志、工作流记录、旧 Git 历史和依赖目录。
 发布审计结果见 `RELEASE_AUDIT.json`；它只记录路径、文件哈希和扫描结果，不记录密钥值。
+Simage 模型规则已写入 `skills/simage/SKILL.md` 和路由：普通生成默认使用 Flare；有参考图且要求精细修改时使用 Sunburst；用户明确指定模型时优先。Agent 通过 `--model auto|flare|sunburst` 与 `--intent auto|speed|precision` 传递判断，路由会在 dry-run 中显示最终模型和原因，失败时不会静默换型号。

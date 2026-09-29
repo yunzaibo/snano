@@ -11,9 +11,12 @@ presets:
     artifactMinHeight: 2048
     artifactDimensionMode: long_edge
   simage:
-    description: APIyi-only GPT Image 2.5 Flare image line.
+    description: APIyi-only GPT Image 2.5 task-based model selection.
+    modelSelection: simage-v1
     providers:
     - apiyi-simage-gpt-image-2-5-flare
+    - apiyi-simage-gpt-image-2-5-sunburst
+    maxRetriesPerProvider: 0
     routingPolicy: fallback
     providerTier: professional
     defaultSize: 2K

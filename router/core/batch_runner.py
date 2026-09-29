@@ -46,6 +46,7 @@ from router.core.response_contract import response_contract_signal
 from router.core.routing_policy import RoutingPolicyPlan, resolve_routing_policy
 from router.core.routing_presets import RoutingPreset
 from router.core.scheduler import ProviderState
+from router.core.simage_selection import select_simage_model
 
 
 KNOWN_PROVIDERS = [
@@ -466,6 +467,9 @@ def _request_replacement_metadata(request: GenerationRequest) -> dict[str, Any]:
 
 def _provider_order(request: GenerationRequest, provider_preference: list[str] | None) -> list[str]:
     preferred = list(provider_preference or [])
+    restricted = request.metadata.get("providerRestriction")
+    if restricted is not None:
+        return [name for name in restricted if name in preferred or not preferred]
     default_order = _default_provider_order(request)
     ordered: list[str] = []
     for name in preferred + default_order:
@@ -645,6 +649,7 @@ def _request_contract(request: GenerationRequest) -> dict[str, Any]:
         "aspect_ratio": request.aspect_ratio,
         "reference_count": len(request.reference_images),
         "source": request.metadata.get("source"),
+        "model_selection": request.metadata.get("modelSelection"),
     }
 
 
@@ -1820,6 +1825,25 @@ def run_job_file(
         default_routing_policy=routing_policy,
         default_provider_tier=provider_tier,
     )
+    if routing_preset and routing_preset.model_selection == "simage-v1":
+        allowed = providers if providers is not None else routing_preset.providers
+        selected_items = []
+        for item_id, request, item_providers in items:
+            candidates = item_providers if item_providers is not None else allowed
+            if any(name not in allowed for name in candidates):
+                raise ValueError("Item provider exceeds the Simage preset/provider restriction")
+            selection = select_simage_model(request, candidates)
+            request = _with_request_metadata(
+                request,
+                {
+                    "modelSelection": asdict(selection),
+                    "providerRestriction": [selection.provider],
+                },
+            )
+            selected_items.append((item_id, request, [selection.provider]))
+        items = selected_items
+        # Build only selected models. Never silently substitute another model on failure.
+        providers = list(dict.fromkeys(name for _, _, names in items for name in names))
     adapters: dict[str, Any] = {}
     startup_errors: dict[str, str] = {}
     if dry_run:

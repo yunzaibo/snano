@@ -26,6 +26,7 @@ class RoutingPreset:
     artifact_min_height: int | None = None
     artifact_dimension_mode: str | None = None
     notes: list[str] = field(default_factory=list)
+    model_selection: str | None = None
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -133,6 +134,7 @@ def load_routing_presets() -> dict[str, RoutingPreset]:
             artifact_min_height=_int_or_none(row.get("artifactMinHeight") or row.get("artifact_min_height")),
             artifact_dimension_mode=_first_text(row.get("artifactDimensionMode"), row.get("artifact_dimension_mode")),
             notes=_string_list(row.get("notes")),
+            model_selection=_first_text(row.get("modelSelection")),
         )
     return presets
 

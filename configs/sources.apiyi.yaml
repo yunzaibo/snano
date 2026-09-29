@@ -66,7 +66,7 @@ lanes:
     account: apiyi-primary
     credential: apiyi-primary-key
     route: apiyi-openai-edits
-    poolIdentity: apiyi-group/api.morewater.vip/simage-gpt-image-2.5-flare
+    poolIdentity: apiyi-group/api.morewater.vip/simage-gpt-image-2.5
     model: gpt-image-2.5-flare-vip
     modelClass: Simage
     defaultSize: 2K
@@ -74,6 +74,32 @@ lanes:
     maxReferenceImages: 16
     maxConcurrency: 30
     priority: 11
+    enabled: true
+    imageContract:
+      textToImagePath: /images/generations
+      requestFormat: multipart
+      textToImageRequestFormat: json
+      referenceField: image
+      requestSizeMode: passthrough
+      defaultSize: 2048x2048
+      suppressFields:
+      - aspect_ratio
+  apiyi-simage-gpt-image-2-5-sunburst:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-openai-edits
+    poolIdentity: apiyi-group/api.morewater.vip/simage-gpt-image-2.5
+    model: gpt-image-2.5-sunburst-vip
+    modelClass: Simage
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 16
+    maxConcurrency: 30
+    priority: 12
     enabled: true
     imageContract:
       textToImagePath: /images/generations

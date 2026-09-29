@@ -7,7 +7,8 @@
       "apiyi-snano"
     ],
     "simage": [
-      "apiyi-simage-gpt-image-2-5-flare"
+      "apiyi-simage-gpt-image-2-5-flare",
+      "apiyi-simage-gpt-image-2-5-sunburst"
     ]
   },
   "records": []

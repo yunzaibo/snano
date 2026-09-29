@@ -98,6 +98,7 @@ from router.snano_dispatch import (  # noqa: E402
     max_workers_for_batch,
     normalize_image_size,
 )
+from router.core.simage_selection import MODEL_CHOICES  # noqa: E402
 
 
 def load_env_file(path: Path) -> dict[str, str]:
@@ -150,6 +151,26 @@ def write_manifest(path: Path, items: list[dict[str, Any]]) -> None:
         "items": items,
     }
     path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def apply_model_selection_flags(
+    items: list[dict[str, Any]],
+    *,
+    model: str,
+    intent: str,
+) -> list[dict[str, Any]]:
+    """Carry explicit Agent routing decisions into each structured request."""
+    for item in items:
+        metadata = item.setdefault("metadata", {})
+        if model != "auto":
+            metadata["simageModel"] = model
+        else:
+            metadata.setdefault("simageModel", "auto")
+        if intent != "auto":
+            metadata["simageIntent"] = intent
+        else:
+            metadata.setdefault("simageIntent", "auto")
+    return items
 
 
 def min_long_edge_for_size(size: str | None, explicit_min_long_edge: int | None) -> int | None:
@@ -262,6 +283,14 @@ def run_batch(
             "ok": False,
             "stdout": completed.stdout,
         }
+    summary_path = payload.get("summary_path")
+    if summary_path and Path(summary_path).exists():
+        try:
+            disk_summary = json.loads(Path(summary_path).read_text(encoding="utf-8"))
+            if disk_summary.get("items"):
+                payload["items"] = disk_summary["items"]
+        except (OSError, json.JSONDecodeError):
+            pass
     payload.update({
         "simage_elapsed_ms": elapsed_ms,
         "manifest_path": str(manifest_path),
@@ -309,6 +338,8 @@ def main() -> int:
     parser.add_argument("--max-workers", type=int, default=None, help="Maximum parallel workers; default is total item count")
     parser.add_argument("--preset", default="simage", help="Routing preset used for the unified Simage batch")
     parser.add_argument("--routing-policy", default=None, help="Override routing policy, e.g. fallback or health_aware_load_balance")
+    parser.add_argument("--model", choices=MODEL_CHOICES, default="auto", help="模型：auto、flare、sunburst 或完整模型 ID")
+    parser.add_argument("--intent", choices=("auto", "speed", "precision"), default="auto", help="任务意图：auto、speed、precision")
     parser.add_argument("--project-profile", default=None, help="Dimension defaults profile, e.g. amazoncar")
     parser.add_argument("--aspect-ratio", default=None, help="Optional target ratio, e.g. 16:9. Omit for auto.")
     parser.add_argument("--size", default="2K", type=normalize_image_size, help="尺寸：1K、2K、4K 或 2048x2048")
@@ -359,14 +390,17 @@ def main() -> int:
         )
         source_manifest = None
 
+    items = apply_model_selection_flags(items, model=args.model, intent=args.intent)
+
     output_root = Path(args.output_root).expanduser().resolve()
     run_id = f"{time.strftime('simage_%Y%m%dT%H%M%SZ', time.gmtime())}_{uuid.uuid4().hex[:8]}"
     run_root = output_root / run_id
     run_root.mkdir(parents=True, exist_ok=True)
 
+    explicit_source_config = os.environ.get("MIR_SOURCES_CONFIG_FILE")
     env = load_env_file(PROJECT_ROOT / ".env.internal")
     env = bypass_proxy_for_apiyi(env)
-    env["MIR_SOURCES_CONFIG_FILE"] = str(PROJECT_ROOT / "configs" / "sources.internal.yaml")
+    env["MIR_SOURCES_CONFIG_FILE"] = explicit_source_config or str(PROJECT_ROOT / "configs" / "sources.apiyi.yaml")
     env["MIR_ROUTING_PRESETS_FILE"] = str(PROJECT_ROOT / "configs" / "routing-presets.yaml")
 
     root_manifest = run_root / "simage-input-manifest.json"
@@ -388,7 +422,12 @@ def main() -> int:
         "run_root": str(run_root),
         "source_manifest": source_manifest,
         "input_manifest": str(root_manifest),
-        "providers": DEFAULT_SIMAGE_PROVIDERS,
+        "providers": sorted({provider for item in batch_summary.get("items", []) for provider in item.get("planned_providers", [])}) or DEFAULT_SIMAGE_PROVIDERS,
+        "model_selection": [
+            item.get("request_contract", {}).get("model_selection")
+            for item in batch_summary.get("items", [])
+            if item.get("request_contract", {}).get("model_selection")
+        ],
         "total_items": len(items),
         "request_type": items[0].get("requestType") if items else None,
         "size": args.size,
