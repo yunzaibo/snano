@@ -8,15 +8,11 @@ from typing import Any, Sequence
 
 
 DEFAULT_SNANO_PROVIDERS = [
-    "apiyi-nano-banana-pro-4k",
-    "laozhang-nano-banana-pro-4k-i2i",
-    "apimart-gemini-i2i",
+    "apiyi-snano",
 ]
 
 DEFAULT_SIMAGE_PROVIDERS = [
-    "apiyi-simage-gpt-image-2",
-    "laozhang-simage-gpt-image-2",
-    "apimart-gpt-image-2-i2i",
+    "apiyi-simage-gpt-image-2-5-flare",
 ]
 
 DEFAULT_SKILL_PROVIDERS = {

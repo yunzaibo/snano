@@ -15,9 +15,7 @@ from typing import Any
 
 
 DEFAULT_SIMAGE_PROVIDERS = [
-    "apiyi-simage-gpt-image-2",
-    "laozhang-simage-gpt-image-2",
-    "apimart-gpt-image-2-i2i",
+    "apiyi-simage-gpt-image-2-5-flare",
 ]
 SIZE_TO_MIN_LONG_EDGE = {
     "1k": 1024,
@@ -134,7 +132,7 @@ def bypass_proxy_for_apiyi(env: dict[str, str]) -> dict[str, str]:
         raw = updated.get(key)
         if raw:
             no_proxy_values.extend(part.strip() for part in raw.split(",") if part.strip())
-    for host in ("api.apiyi.com", "vip.apiyi.com"):
+    for host in ("api.apiyi.com", "vip.apiyi.com", "api.morewater.vip"):
         if host not in no_proxy_values:
             no_proxy_values.append(host)
     no_proxy = ",".join(no_proxy_values)

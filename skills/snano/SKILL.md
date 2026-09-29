@@ -1,6 +1,6 @@
 ---
 name: snano
-description: 使用 snano 路由进行文生图、参考图生成和图片数量统计。
+description: 使用 snano 路由进行 Nano Banana Pro / nano-banana-pro 文生图、参考图生成和图片数量统计。
 ---
 
 # snano
@@ -10,7 +10,7 @@ description: 使用 snano 路由进行文生图、参考图生成和图片数量
 尺寸未指定时用中文询问，选项显示 `1K`、`2K`、`4K`，也接受具体尺寸 `2048×2048`；
 比例显示 `1:1` 或 `16:9`。不要把宽高比称为像素尺寸。已明确的参数不重复询问。
 
-先按仓库 README 初始化环境和本机配置。运行本技能目录下的 `scripts/snano-run.py`：
+先按仓库 README 初始化环境和本机配置。Nano Banana Pro / nano-banana-pro 只走 APIyi 聚合地址；运行本技能目录下的 `scripts/snano-run.py`：
 
 ```bash
 python3 scripts/snano-run.py --prompt "产品摄影" --count 1 --size 2K --output-root /absolute/output --dry-run

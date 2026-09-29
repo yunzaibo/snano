@@ -7,7 +7,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     for template, target in (
         (".env.example", ".env.internal"),
-        ("configs/sources.shared.example.yaml", "configs/sources.internal.yaml"),
+        ("configs/sources.apiyi.yaml", "configs/sources.internal.yaml"),
     ):
         destination = root / target
         try:

@@ -4,14 +4,10 @@
   "source": "empty",
   "lineLanes": {
     "snano": [
-      "apiyi-nano-banana-pro-4k",
-      "laozhang-nano-banana-pro-4k-i2i",
-      "apimart-gemini-i2i"
+      "apiyi-snano"
     ],
     "simage": [
-      "apiyi-simage-gpt-image-2",
-      "laozhang-simage-gpt-image-2",
-      "apimart-gpt-image-2-i2i"
+      "apiyi-simage-gpt-image-2-5-flare"
     ]
   },
   "records": []

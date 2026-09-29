@@ -1,0 +1,86 @@
+schemaVersion: multi-source-config/v1
+stations:
+  apiyi-main:
+    kind: relay
+    displayName: APIyi aggregate image relay
+    baseUrl: https://api.morewater.vip/v1
+    vendorGroup: apiyi-group
+    sourceTier: professional
+    enabled: true
+accounts:
+  apiyi-primary:
+    station: apiyi-main
+    accountGroup: apiyi-primary
+    enabled: true
+credentials:
+  apiyi-primary-key:
+    account: apiyi-primary
+    secretRef:
+      type: env
+      name: MIR_APIYI_API_KEY
+    authScheme: bearer
+    enabled: true
+routes:
+  apiyi-openai-images:
+    station: apiyi-main
+    adapterFamily: openai_images
+    path: /images/generations
+    enabled: true
+  apiyi-openai-edits:
+    station: apiyi-main
+    adapterFamily: openai_images
+    path: /images/edits
+    enabled: true
+lanes:
+  apiyi-snano:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-openai-edits
+    poolIdentity: apiyi-group/api.morewater.vip/snano-nano-banana-pro
+    model: nano-banana-pro
+    modelClass: Snano
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 16
+    maxConcurrency: 30
+    priority: 10
+    enabled: true
+    imageContract:
+      textToImagePath: /images/generations
+      requestFormat: multipart
+      textToImageRequestFormat: json
+      referenceField: image
+      requestSizeMode: passthrough
+      defaultSize: 2048x2048
+      suppressFields:
+      - aspect_ratio
+  apiyi-simage-gpt-image-2-5-flare:
+    provider: apiyi
+    providerGroup: apiyi-group
+    sourceTier: professional
+    station: apiyi-main
+    account: apiyi-primary
+    credential: apiyi-primary-key
+    route: apiyi-openai-edits
+    poolIdentity: apiyi-group/api.morewater.vip/simage-gpt-image-2.5-flare
+    model: gpt-image-2.5-flare-vip
+    modelClass: Simage
+    defaultSize: 2K
+    capabilityBucket: IM
+    maxReferenceImages: 16
+    maxConcurrency: 30
+    priority: 11
+    enabled: true
+    imageContract:
+      textToImagePath: /images/generations
+      requestFormat: multipart
+      textToImageRequestFormat: json
+      referenceField: image
+      requestSizeMode: passthrough
+      defaultSize: 2048x2048
+      suppressFields:
+      - aspect_ratio
